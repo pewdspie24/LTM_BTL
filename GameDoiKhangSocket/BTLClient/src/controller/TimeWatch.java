@@ -5,7 +5,6 @@
  */
 package controller;
 
-import interfaces.Constant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import view.GUI_Game;
@@ -19,7 +18,7 @@ import view.GUI_Home;
 public class TimeWatch implements Runnable {
 
     GUI_Game gui_game;
-    public int time = Constant.TIME_PLAY;
+    public int time = 90;
     boolean isRunning = true;
 
     public TimeWatch(GUI_Game gui_game) {

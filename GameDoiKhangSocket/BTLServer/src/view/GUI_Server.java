@@ -6,7 +6,6 @@
 package view;
 
 import controller.GameServer;
-import Interface.Constant;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.text.SimpleDateFormat;
@@ -21,7 +20,7 @@ import model.User;
  *
  * @author nguye
  */
-public class GUI_Server extends javax.swing.JFrame implements Constant {
+public class GUI_Server extends javax.swing.JFrame {
 
     SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss a");
     GameServer gameServer;
@@ -45,6 +44,11 @@ public class GUI_Server extends javax.swing.JFrame implements Constant {
     public void addPlayer(Player p){
         onlinePlayer.add(p);
         onlineList.add(p.user);
+    }
+    
+    public void removePlayer(Player p){
+        onlinePlayer.remove(p);
+        onlineList.remove(p.user);
     }
 
     public void appendMessage(String msg) {
@@ -152,7 +156,7 @@ public class GUI_Server extends javax.swing.JFrame implements Constant {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnStartServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartServerActionPerformed
-        gameServer = new GameServer(this, SOCKET_PORT);
+        gameServer = new GameServer(this, 2408);
 
         t = new Thread(gameServer);
         t.start();

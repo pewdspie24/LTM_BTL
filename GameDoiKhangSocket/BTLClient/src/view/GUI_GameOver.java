@@ -5,6 +5,7 @@
  */
 package view;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
@@ -36,6 +37,12 @@ public class GUI_GameOver extends javax.swing.JFrame {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
         this.gui_game = gui_game;
+        if (result.equals("You win!!!")){
+            this.text.setForeground(Color.green);
+        }
+        else if(result.equals("You tie!!!")){
+            this.text.setForeground(Color.orange);
+        }
         this.text.setText(result);
         this.time.setText(showTime(gui_game.timeover));
         this.numberCorrect.setText(gui_game.correctQuestion + "");
@@ -82,7 +89,7 @@ public class GUI_GameOver extends javax.swing.JFrame {
         text.setText("YOU WIN");
 
         numberCorrect.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        numberCorrect.setText("10 / 15");
+        numberCorrect.setText("15 / 15");
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText("Correct Answer:");
@@ -91,7 +98,7 @@ public class GUI_GameOver extends javax.swing.JFrame {
         jLabel2.setText("Time:");
 
         time.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        time.setText("02 : 10");
+        time.setText("01 : 15");
 
         jButton2.setText("CLOSE");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -182,7 +189,7 @@ public class GUI_GameOver extends javax.swing.JFrame {
             ObjectOutputStream oos = new ObjectOutputStream(this.gui_game.socket.getOutputStream());
             Request req = new Request(0);
             req.action = "challenge";
-            req.user =  this.gui_game.enemy;
+            req.user =  this.gui_game.opponent;
             oos.writeObject(req);
             oos.flush();
         } catch (IOException ex) {

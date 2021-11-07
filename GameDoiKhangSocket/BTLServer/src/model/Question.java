@@ -5,14 +5,13 @@
  */
 package model;
 
-import Interface.ToObject;
 import java.io.Serializable;
 
 /**
  *
  * @author nguye
  */
-public class Question implements ToObject, Serializable {
+public class Question implements Serializable {
     static final long serialVersionUID = 2L;
     private int id;
     private String content;
@@ -85,8 +84,7 @@ public class Question implements ToObject, Serializable {
     public String toString() {
         return "Question{" + "id=" + id + ", content=" + content + ", answer1=" + answer1 + ", answer2=" + answer2 + ", answer3=" + answer3 + ", answer4=" + answer4 + ", key=" + key + '}';
     }
-    
-    @Override
+
     public Object[] toObject() {
         return new Object[]{id, content, answer1, answer2, answer3, answer4, key};
     }

@@ -5,7 +5,6 @@
  */
 package controller;
 
-import interfaces.Constant;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import model.User;
 import view.GUI_DetailGame;
 import view.GUI_Game;
 import view.GUI_GameOver;
+import view.GUI_History;
 import view.GUI_Home;
 import view.GUI_Login;
 import view.GUI_Rank;
@@ -25,7 +25,7 @@ import view.GUI_Signup;
  *
  * @author nguye
  */
-public class GameClient implements Constant {
+public class GameClient {
 
     public static Socket socket = null;
     public static User user = null;
@@ -38,19 +38,21 @@ public class GameClient implements Constant {
     public static GUI_Game gui_game = null;
     public static GUI_GameOver gui_gameover = null;
     public static GUI_DetailGame gui_detailgame = null;
+    public static GUI_History gui_history = null;
     public static ArrayList<Question> questions = new ArrayList<>();
 
     public void init() {
         try {
-            GameClient.socket = new Socket(IP_SERVER, SOCKET_PORT);
+            GameClient.socket = new Socket("localhost", 2408);
             new Thread(new Controller(GameClient.socket)).start();
             GameClient.gui_login = new GUI_Login();
             GameClient.gui_login.setVisible(true);
             GameClient.gui_home = new GUI_Home();
             GameClient.gui_signup = new GUI_Signup();
-            GameClient.gui_game = new GUI_Game(questions, socket, Constant.TIME_PLAY, user);
+            GameClient.gui_game = new GUI_Game(questions, socket, 90, user);
             GameClient.gui_gameover = new GUI_GameOver("", this.gui_game);
             GameClient.gui_rank = new GUI_Rank();
+            GameClient.gui_history = new GUI_History();
         } catch (IOException ex) {
             System.out.println("The server is not start");
         }

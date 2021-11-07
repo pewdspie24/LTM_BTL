@@ -57,7 +57,6 @@ public class GUI_Signup extends javax.swing.JFrame {
         password = new javax.swing.JPasswordField();
         cpassword = new javax.swing.JPasswordField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 0));
         setFont(new java.awt.Font("Agency FB", 1, 10)); // NOI18N
 

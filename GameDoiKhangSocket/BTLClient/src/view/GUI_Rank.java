@@ -38,7 +38,7 @@ public class GUI_Rank extends javax.swing.JFrame {
 
             },
             new String [] {
-                "STT", "Nick Name", "Score", "Time"
+                "STT", "Nick Name", "Score", "Matches"
             }
         ) {
             Class[] types = new Class [] {
@@ -55,7 +55,7 @@ public class GUI_Rank extends javax.swing.JFrame {
         label1.setName(""); // NOI18N
         label1.setText("RANK");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Score", "Time" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Scores", "Matches" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -111,8 +111,8 @@ public class GUI_Rank extends javax.swing.JFrame {
         dtm = (DefaultTableModel) this.jTable1.getModel();
         dtm.setRowCount(0);
         for (int i = 0; i < users.size(); i++) {
-            System.out.println("scores = " +  users.get(i).getScore());
-            dtm.addRow(new Object[]{i + 1 + "", users.get(i).getNickname(), users.get(i).getScore(), users.get(i).getTime()});
+//            System.out.println("scores = " +  users.get(i).getScore());
+            dtm.addRow(new Object[]{i + 1 + "", users.get(i).getNickname(), users.get(i).getScore(), users.get(i).getNumOfmatches()});
         }
         this.jTable1.setModel(dtm);
     }

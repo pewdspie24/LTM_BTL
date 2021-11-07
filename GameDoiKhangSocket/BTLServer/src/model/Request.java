@@ -21,6 +21,7 @@ public class Request implements Serializable {
     public ArrayList<User> onlineList;
     public ArrayList<User> rank;
     public ArrayList<Question> questions;
+    public ArrayList<History> historys;
     public User user;
     public String message;
     

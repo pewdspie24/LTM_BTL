@@ -5,7 +5,6 @@
  */
 package model;
 
-import interfaces.ToObject;
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -13,7 +12,7 @@ import java.util.HashMap;
  *
  * @author nguye
  */
-public class User implements ToObject, Serializable {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private int id;
@@ -112,7 +111,6 @@ public class User implements ToObject, Serializable {
         this.time = time;
     }
 
-    @Override
     public Object[] toObject() {
         return new Object[]{id, username, nickname, password, numOfmatches, win, status, scores, time};
     }

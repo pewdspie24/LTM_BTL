@@ -11,9 +11,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.History;
 import model.MD5;
 import model.Match;
 import model.Request;
@@ -39,6 +43,15 @@ public class Controller {
         Request req = new Request(0);
         req.action = "rank";
         req.rank = getRank(10,text);
+        player.oos.writeObject(req);
+        player.oos.flush();
+    }
+    // gửi lịch sử đấu
+    public void repHistory(User user, Player player) throws IOException{
+        Request req = new Request(0);
+        req.action = "history";
+        req.historys = getHistorys(user.getUsername());
+//        req.message = user.getNickname() + "|" + this.getNNFromID(req.historys)
         player.oos.writeObject(req);
         player.oos.flush();
     }
@@ -68,9 +81,13 @@ public class Controller {
         return null;
     }
 // login
-    public void login(Request req, Player player) throws IOException {
+    public int login(Request req, Player player) throws IOException {
         Request request = new Request(0);
         request.action = "login";
+//        for(Player p : gui_server.onlinePlayer){
+//            this.sendOnlineList(p.oos, gui_server.onlineList);
+//        }
+//        System.out.println(this.checkLogin(gui_server.onlineList, req.data[0]));
         if (this.checkLogin(gui_server.onlineList, req.data[0])) {
             User user = this.getUser(req.data[0], req.data[1]);
             if (user != null) {
@@ -84,16 +101,30 @@ public class Controller {
                 for(Player p : gui_server.onlinePlayer){
                     this.sendOnlineList(p.oos, gui_server.onlineList);
                 }
-                return;
+                return 1;
             }
             request.message = "Username or password are incorrect";
             player.oos.writeObject(request);
             player.oos.flush();
-            return;
+            return 0;
         }
         request.message = "Player is online";
         player.oos.writeObject(request);
         player.oos.flush();
+        return 2;
+    }
+    
+    public void logout(Request req, Player player) throws IOException{
+        Request request = new Request(0);
+        player.status = 0;
+        gui_server.removePlayer(player);
+        request.action = "logout";
+        player.oos.writeObject(request);
+        player.oos.flush();
+//        System.out.println(this.checkLogin(gui_server.onlineList, player.getUser().getUsername()));
+        for(Player p : gui_server.onlinePlayer){
+            this.sendOnlineList(p.oos, gui_server.onlineList);
+        }
     }
 // lấy ra một user
     public User getUser(String username, String password) {
@@ -117,6 +148,26 @@ public class Controller {
         }
         return null;
     }
+    
+    public String getNNFromID(int id) {
+        try {
+            String query = "SELECT nickname From `users` WHERE `id` = ?";
+            ResultSet result;
+
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                ps.setInt(1, id);
+                result = ps.executeQuery();
+                result.last();
+
+                if (result.getRow() != 0) {
+                    return result.getString("nickname");
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 // kiểm tra user đã login hay chưa
     public boolean checkLogin(ArrayList<User> list, String username) {
         for (User user : list) {
@@ -126,19 +177,38 @@ public class Controller {
         }
         return true;
     }
+    // check xem user đó đã tồn tại trong csdl hay chưa
+    public boolean checkUser(String username) {
+        try {
+            String query = "SELECT * From `users` WHERE `username` = ?";
+            ResultSet result;
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                ps.setString(1, username);
+                result = ps.executeQuery();
+                if (result.first()) {
+                    return true;
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
 // đăng kí
-    public void signup(String[] data, Player player) throws IOException {
+    public int signup(String[] data, Player player) throws IOException {
         Request req = new Request(3);
         if (checkUser(data[0])) {
             req.action = "signup";
             req.message = "existed";
             player.oos.writeObject(req);
             player.oos.flush();
+            return 0;
         } else {
-            req.action = "login";
-            req.data = data;
+            req.action = "signup";
             addUser(data);
-            this.login(req, player);
+            player.oos.writeObject(req);
+            player.oos.flush();
+            return 1;
         }
     }
 // thêm user vào csdl
@@ -159,23 +229,8 @@ public class Controller {
             Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-// check xem user đó đã tồn tại trong csdl hay chưa
-    public boolean checkUser(String username) {
-        try {
-            String query = "SELECT * From `users` WHERE `username` = ?";
-            ResultSet result;
-            try (PreparedStatement ps = con.prepareStatement(query)) {
-                ps.setString(1, username);
-                result = ps.executeQuery();
-                if (result.first()) {
-                    return true;
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
-    }
+    
+
 // đóng gói user khi query ra cho nó vào list
     public User createUser(ResultSet result) {
         try {
@@ -204,6 +259,20 @@ public class Controller {
         req.onlineList = list;
         oos.writeObject(req);
         oos.flush();
+    }
+    public void sendMessage(ArrayList<Player> list, String chat, User user) throws IOException{
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");   
+        Date date = new Date();    
+        String timenow = formatter.format(date);  
+        for (Player player : list){
+            Request req = new Request(0);
+            req.action = "broadcastMessage";
+            req.message = user.getNickname()+" ("+timenow+"): "+chat;
+            ObjectOutputStream oos = player.oos;
+            oos.writeObject(req);
+            oos.flush();
+        }
+        
     }
 // gửi yêu cầu thách đấu
     public void challenge(ArrayList<Player> list, User user1, User user2) throws IOException {
@@ -248,6 +317,7 @@ public class Controller {
             player.oos.flush();
         }
     }
+    
 // sau khi chơi khi click submit thì lưu kết quả lại
     public void result(Request request, Player player1) throws IOException {
         Match match = findMatch(Integer.parseInt(request.data[0]));
@@ -273,40 +343,40 @@ public class Controller {
                     if(match.getUser1().getId() == player1.getUser().getId()){
                         req1.message = "win";
                         req2.message = "lose";
-                        saveResult(1, match.getCorrectUser1() + "", player1.user);
-                        saveResult(0, request.data[2], player2.user);
+                        saveResult(1, match.getCorrectUser1() + "", player1.user, player2.user);
+                        saveResult(0, request.data[2], player2.user, player1.user);
                     }
                     else{
                         req1.message = "lose";
                         req2.message = "win";
-                        saveResult(1, match.getCorrectUser1() + "", player2.user);
-                        saveResult(0, request.data[2], player1.user);
+                        saveResult(1, match.getCorrectUser1() + "", player2.user, player1.user);
+                        saveResult(0, request.data[2], player1.user, player2.user);
                     }
                 } 
                 else if(match.getCorrectUser1() < Integer.parseInt(request.data[1])){
                     if(match.getUser1().getId() == player1.getUser().getId()){
                         req1.message = "lose";
                         req2.message = "win";
-                        saveResult(0, match.getCorrectUser1() + "", player1.user);
-                        saveResult(1, request.data[2], player2.user);
+                        saveResult(0, match.getCorrectUser1() + "", player1.user, player2.user);
+                        saveResult(1, request.data[2], player2.user, player1.user);
                     }
                     else{
                         req1.message = "win";
                         req2.message = "lose";
-                        saveResult(0, match.getCorrectUser1() + "", player2.user);
-                        saveResult(1, request.data[2], player1.user);
+                        saveResult(0, match.getCorrectUser1() + "", player2.user, player1.user);
+                        saveResult(1, request.data[2], player1.user, player2.user);
                     }
                 }
                 else{
                     req1.message = "draw";
                     req2.message = "draw";
                     if(match.getUser1().getId() == player1.getUser().getId()){
-                        saveResult(0.5, match.getCorrectUser1() + "", player1.user);
-                        saveResult(0.5, request.data[2], player2.user);
+                        saveResult(0.5, match.getCorrectUser1() + "", player1.user, player2.user);
+                        saveResult(0.5, request.data[2], player2.user, player1.user);
                     }
                     else{
-                        saveResult(0.5, match.getCorrectUser1() + "", player2.user);
-                        saveResult(0.5, request.data[2], player1.user);
+                        saveResult(0.5, match.getCorrectUser1() + "", player2.user, player1.user);
+                        saveResult(0.5, request.data[2], player1.user, player2.user);
                     }
                     
                 }
@@ -317,40 +387,40 @@ public class Controller {
                     if(match.getUser2().getId() == player1.getUser().getId()){
                         req1.message = "win";
                         req2.message = "lose";
-                        saveResult(1, match.getCorrectUser2() + "", player1.user);
-                        saveResult(0, request.data[2], player2.user);
+                        saveResult(1, match.getCorrectUser2() + "", player1.user, player2.user);
+                        saveResult(0, request.data[2], player2.user, player1.user);
                     }
                     else{
                         req1.message = "lose";
                         req2.message = "win";
-                        saveResult(1, match.getCorrectUser2() + "", player2.user);
-                        saveResult(0, request.data[2], player1.user);
+                        saveResult(1, match.getCorrectUser2() + "", player2.user, player1.user);
+                        saveResult(0, request.data[2], player1.user, player2.user);
                     }
                 } 
                 else if(match.getCorrectUser2() < Integer.parseInt(request.data[1])){
                     if(match.getUser2().getId() == player1.getUser().getId()){
                         req1.message = "lose";
                         req2.message = "win";
-                        saveResult(0, match.getCorrectUser2() + "", player1.user);
-                        saveResult(1, request.data[2], player2.user);
+                        saveResult(0, match.getCorrectUser2() + "", player1.user, player2.user);
+                        saveResult(1, request.data[2], player2.user, player1.user);
                     }
                     else{
                         req1.message = "win";
                         req2.message = "lose";
-                        saveResult(0, match.getCorrectUser2() + "", player2.user);
-                        saveResult(1, request.data[2], player1.user);
+                        saveResult(0, match.getCorrectUser2() + "", player2.user, player1.user);
+                        saveResult(1, request.data[2], player1.user, player2.user);
                     }
                 }
                 else{
                     req1.message = "draw";
                     req2.message = "draw";
                     if(match.getUser2().getId() == player1.getUser().getId()){
-                        saveResult(0.5, match.getCorrectUser2() + "", player1.user);
-                        saveResult(0.5, request.data[2], player2.user);
+                        saveResult(0.5, match.getCorrectUser2() + "", player1.user, player2.user);
+                        saveResult(0.5, request.data[2], player2.user, player1.user);
                     }
                     else{
-                        saveResult(0.5, match.getCorrectUser2() + "", player2.user);
-                        saveResult(0.5, request.data[2], player1.user);
+                        saveResult(0.5, match.getCorrectUser2() + "", player2.user, player1.user);
+                        saveResult(0.5, request.data[2], player1.user, player2.user);
                     }
                 }
             }
@@ -361,18 +431,30 @@ public class Controller {
             gui_server.matchList.remove(match);
         }
     }
-    // cập nhật kết quả vào user
-    public void saveResult(double score, String timeover, User user) {
+    // cập nhật kết quả vào user và history
+    public void saveResult(double score, String timeover, User user, User user2) {
         int win = score == 1 ? 1 : 0;
         int time = user.getTime();
         //Thắng thì thay đổi lại thời gian trung bình của lần thắng
         if (win == 1) {
             time = (user.getTime() * user.getWin() + win * Integer.parseInt(timeover)) / (user.getWin() + 1);
         }
+        String state = "";
+        if (score == 1){
+            state = "WIN";
+        }
+        else if (score == 0){
+            state = "LOSE";
+        }
+        else{
+            state = "DRAW";
+        }
         user.setNumOfmatches(user.getNumOfmatches() + 1);
         user.setScore(user.getScore() + score);
         user.setWin(user.getWin() + win);
         user.setTime(time);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+        Date date = new Date();  
         try {
             String query = "UPDATE `users` SET `scores` = ?, `win` = ?, `matches` = ?, `time` = ? WHERE `username` = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
@@ -381,6 +463,14 @@ public class Controller {
                 ps.setInt(3, user.getNumOfmatches());
                 ps.setInt(4, time);
                 ps.setString(5, user.getUsername());
+                ps.executeUpdate();
+            }
+            String query2 = "INSERT INTO `history` (username1, username2, state, timestamp) VALUES (?, ?, ?, ?);";
+            try (PreparedStatement ps = con.prepareStatement(query2)){
+                ps.setString(1, user.getUsername());
+                ps.setString(2, user2.getUsername());
+                ps.setString(3, state);
+                ps.setString(4, formatter.format(date));
                 ps.executeUpdate();
             }
         } catch (SQLException ex) {
@@ -424,6 +514,26 @@ public class Controller {
         }
         return null;
     }
+    
+    public ArrayList<History> getHistorys(String username){
+        String query = "SELECT * FROM `history` WHERE username1 = ? ORDER BY id";
+        ResultSet result;
+        ArrayList<History> list = new ArrayList<>();
+        History history;
+        try {
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, username);
+            result = ps.executeQuery();
+            while (result.next()) {
+                history = createHistory(result);
+                list.add(history);
+            }
+            return list;
+        } catch (SQLException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 // tạo đối tượng câu hỏi để đẩy vào list
     public Question createQuestion(ResultSet result) throws SQLException {
         Question q = new Question();
@@ -438,6 +548,16 @@ public class Controller {
         return q;
     }
 
+    public History createHistory(ResultSet result) throws SQLException {
+        History h = new History();
+        h.setId(result.getInt("id"));
+        h.setUserNN1(result.getString("username1"));
+        h.setUserNN2(result.getString("username2"));
+        h.setState(result.getString("state"));
+        h.setTimestamp(result.getString("timestamp"));
+        return h;
+    }
+    
 // cập nhât trạng thái của player
     public void updateStatus(Player player, String status) throws IOException {
         for (int i = 0; i < gui_server.onlineList.size(); i++) {

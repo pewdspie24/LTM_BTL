@@ -70,7 +70,7 @@
                 <Column editable="true" title="STT" type="java.lang.Integer"/>
                 <Column editable="true" title="Nick Name" type="java.lang.String"/>
                 <Column editable="true" title="Score" type="java.lang.Double"/>
-                <Column editable="true" title="Time" type="java.lang.Integer"/>
+                <Column editable="true" title="Matches" type="java.lang.Integer"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -117,8 +117,8 @@
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="2">
-            <StringItem index="0" value="Score"/>
-            <StringItem index="1" value="Time"/>
+            <StringItem index="0" value="Scores"/>
+            <StringItem index="1" value="Matches"/>
           </StringArray>
         </Property>
       </Properties>

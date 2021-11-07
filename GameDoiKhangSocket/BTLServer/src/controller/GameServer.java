@@ -5,7 +5,6 @@
  */
 package controller;
 
-import Interface.Constant;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,7 +18,7 @@ import model.User;
 import view.GUI_Server;
 
 
-public class GameServer implements Runnable, Constant {
+public class GameServer implements Runnable {
 
     ServerSocket serverSocket;
     public Connection connect = null;

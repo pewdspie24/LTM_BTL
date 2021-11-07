@@ -14,11 +14,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import model.History;
 import model.Request;
 import model.User;
 import view.GUI_Game;
+import view.GUI_History;
 import view.GUI_Home;
-import view.ItemModel;
+import view.jListModified;
 
 /**
  *
@@ -46,8 +48,16 @@ public class Controller implements Runnable {
                         break;
                     case "signup":
                         if ("existed".equalsIgnoreCase(response.message)) {
-                            JOptionPane.showMessageDialog(null, "the Account has existed");
+                            JOptionPane.showMessageDialog(null, "Account has existed");
                         }
+                        else{
+                            JOptionPane.showMessageDialog(null, "Signup Completed!");
+                            GameClient.gui_signup.setVisible(false);
+                        }
+                        break;
+                    case "logout":
+                        GameClient.gui_home.setVisible(false);
+                        GameClient.gui_login.setVisible(true);
                         break;
                     case "loadOnline":
                         this.resetOnlineList(response.onlineList);
@@ -64,7 +74,15 @@ public class Controller implements Runnable {
                         this.repChallenge(response);
                         break;
                     case "result":
+                        GameClient.gui_game.closeNoti();
                         this.result(response);
+                        break;
+                    case "broadcastMessage":
+                        this.showMessage(response);
+                        break;
+                    case "history":
+                        GameClient.gui_history.showHistory(response.historys);
+                        GameClient.gui_history.setVisible(true);
                         break;
                 }
             }
@@ -86,11 +104,11 @@ public class Controller implements Runnable {
             //Show GUI_Home
             GameClient.gui_home.nickName.setText(GameClient.user.getNickname());
             GameClient.gui_home.cbStatus.setSelectedItem(GameClient.user.getStatus() == 1 ? "Online" : "Busy");
+            JOptionPane.showMessageDialog(null, "Login success");
             GameClient.gui_home.setVisible(true);
             //hide gui_login
             GameClient.gui_login.setVisible(false);
             GameClient.gui_signup.setVisible(false);
-            JOptionPane.showMessageDialog(null, "Login success");
         } else {
             JOptionPane.showMessageDialog(null, req.message);
         }
@@ -106,7 +124,11 @@ public class Controller implements Runnable {
             }
         }
         GUI_Home.onlineList.setModel(model);
-        GUI_Home.onlineList.setCellRenderer(new ItemModel());
+        GUI_Home.onlineList.setCellRenderer(new jListModified());
+    }
+    
+    public void showMessage(Request req){
+        GameClient.gui_home.chatBoxUpdate(req.message);
     }
     
     public void challenge(User user) throws IOException {
@@ -147,7 +169,7 @@ public class Controller implements Runnable {
             GameClient.gui_game.btnSubmit.setEnabled(false);
             return;
         }
-        GameClient.gui_game.showResult("You have a draw!!!");
+        GameClient.gui_game.showResult("You tie!!!");
         GameClient.gui_game.time.stop();
     }
 }

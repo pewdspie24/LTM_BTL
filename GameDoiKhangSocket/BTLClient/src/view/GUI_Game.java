@@ -5,7 +5,6 @@
  */
 package view;
 
-import interfaces.Constant;
 import controller.GameClient;
 import controller.TimeWatch;
 import java.awt.Dimension;
@@ -16,6 +15,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import model.Request;
 import model.Question;
@@ -36,17 +36,18 @@ public class GUI_Game extends javax.swing.JFrame {
     public ArrayList<Question> questions = new ArrayList<>();
     public int timeover;
     public Socket socket;
-    public User enemy;
-
+    public User opponent;
+    public JOptionPane jop = new JOptionPane();
+    
     /**
      * Creates new form GUI_Game
      *
      * @param questions
      * @param socket
      * @param matchID
-     * @param enemy
+     * @param opponent
      */
-    public GUI_Game(ArrayList<Question> questions, Socket socket, int matchID, User enemy) {
+    public GUI_Game(ArrayList<Question> questions, Socket socket, int matchID, User opponent) {
         initComponents();
         //Set frame location         
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -54,7 +55,7 @@ public class GUI_Game extends javax.swing.JFrame {
         this.setAnswers(yourAnswer);
         this.socket = socket;
         this.matchID = matchID;
-        this.enemy = enemy;
+        this.opponent = opponent;
         this.questions = questions;
         this.time = new TimeWatch(this);
         if (this.questions.size() > 0) {
@@ -128,17 +129,17 @@ public class GUI_Game extends javax.swing.JFrame {
         txtTime = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         question = new javax.swing.JLabel();
-        btnSubmit = new javax.swing.JButton();
         btnNext = new javax.swing.JButton();
         btnQuit = new javax.swing.JButton();
+        btnSubmit = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         content.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         content.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        content.setText("Content.....");
+        content.setText("Question");
         content.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         buttonGroup1.add(ans1);
@@ -180,9 +181,12 @@ public class GUI_Game extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(46, 46, 46)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ans3)
-                    .addComponent(ans1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(ans3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(ans1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(ans4)
                     .addComponent(ans2))
@@ -195,7 +199,7 @@ public class GUI_Game extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(37, 37, 37)
                         .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,13 +233,6 @@ public class GUI_Game extends javax.swing.JFrame {
 
         question.setText("01");
 
-        btnSubmit.setText("SUBMIT");
-        btnSubmit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSubmitActionPerformed(evt);
-            }
-        });
-
         btnNext.setText("NEXT");
         btnNext.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -250,6 +247,13 @@ public class GUI_Game extends javax.swing.JFrame {
             }
         });
 
+        btnSubmit.setText("SUBMIT");
+        btnSubmit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSubmitActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -258,11 +262,13 @@ public class GUI_Game extends javax.swing.JFrame {
                 .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(48, 48, 48)
                         .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(60, 60, 60)
-                        .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(11, 11, 11))
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -293,9 +299,9 @@ public class GUI_Game extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSubmit)
                     .addComponent(btnNext)
-                    .addComponent(btnQuit))
+                    .addComponent(btnQuit)
+                    .addComponent(btnSubmit))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
@@ -347,9 +353,12 @@ public class GUI_Game extends javax.swing.JFrame {
             this.btnSubmit.setEnabled(false);
             this.btnNext.setEnabled(false);
             this.time.stop();
-            this.timeover = Constant.TIME_PLAY - this.time.time;
+            this.timeover = 90 - this.time.time;
             sendResult();
-            JOptionPane.showMessageDialog(this, "Waiting for the other player...");
+            jop.setMessageType(JOptionPane.PLAIN_MESSAGE);
+            jop.setMessage("Waiting for the other player...");
+            JDialog dialog = jop.createDialog(null, "Waiting for the other player...");
+            dialog.setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(GUI_Game.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -359,7 +368,9 @@ public class GUI_Game extends javax.swing.JFrame {
         // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_btnQuitActionPerformed
-
+    public void closeNoti(){
+        JOptionPane.getRootFrame().dispose();   
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton ans1;
