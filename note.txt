@@ -1,0 +1,7 @@
+Chức năng mới:
+- Thêm bảng history
+- Thêm chức năng xem lịch sử đấu
+- Thêm chức năng logout
+- Thêm chức năng chat
+- Thêm chức năng refresh GUI home client
+- *Fix bugs login, logout, signup, tìm trận, kết trận, xem rank.
