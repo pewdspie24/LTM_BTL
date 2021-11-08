@@ -68,6 +68,17 @@ INSERT INTO `users` (`id`, `username`, `password`, `nickname`, `scores`, `matche
 (30, 'Dattt', 'c4ca4238a0b923820dcc509a6f75849b', 'Dattt', 0.5, 1, 0, 0),
 (31, 'BACC', 'c4ca4238a0b923820dcc509a6f75849b', 'baccc', 0, 0, 0, 0);
 
+CREATE TABLE `history` (
+  `id` int(11) NOT NULL,
+  `username1` varchar(50) NOT NULL,
+  `username2` varchar(50) NOT NULL,
+  `state` varchar(50) NOT NULL,
+  `timestamp` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `history`
+  ADD PRIMARY KEY (`id`);
+
 ALTER TABLE `questions`
   ADD PRIMARY KEY (`id`);
 
@@ -80,3 +91,6 @@ ALTER TABLE `questions`
 
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+ALTER TABLE `history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
