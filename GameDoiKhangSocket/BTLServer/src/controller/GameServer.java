@@ -44,7 +44,7 @@ public class GameServer implements Runnable {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             try {
-                this.connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/db_game?useSSL=false", "root", "123456");
+                this.connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/db_game?useSSL=false", "admin", "123456");
                 this.gui_server.appendMessage("[Server]: Server connected to mysql");
             } catch (SQLException ex) {
                 System.out.println("Can't connect to mysql.");
