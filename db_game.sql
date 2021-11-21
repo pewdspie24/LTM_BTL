@@ -47,27 +47,6 @@ CREATE TABLE `users` (
   `time` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `users` (`id`, `username`, `password`, `nickname`, `scores`, `matches`, `win`, `time`) VALUES
-(2, 'nguyenxuanbac', 'c4ca4238a0b923820dcc509a6f75849b', 'Xbawcs', 1, 4, 1, 0),
-(3, 'bac', 'c4ca4238a0b923820dcc509a6f75849b', 'Sphynx', 2, 15, 3, 17),
-(4, 'bac1', 'c4ca4238a0b923820dcc509a6f75849b', 'Depzzzz', 3, 10, 3, 30),
-(5, 'bac2', 'c4ca4238a0b923820dcc509a6f75849b', 'bac2', 1, 3, 1, 0),
-(17, 'bac13', 'c4ca4238a0b923820dcc509a6f75849b', 'bac13', 0, 0, 0, 0),
-(18, 'bac3', 'c4ca4238a0b923820dcc509a6f75849b', 'bac3', 1, 2, 1, 0),
-(19, 'bac4', 'c4ca4238a0b923820dcc509a6f75849b', 'bac4', 0, 0, 0, 0),
-(20, 'bac5', 'c4ca4238a0b923820dcc509a6f75849b', 'bac5', 0, 0, 0, 0),
-(21, 'bac6', 'c4ca4238a0b923820dcc509a6f75849b', 'bac6', 0, 0, 0, 0),
-(22, 'bac7', 'c4ca4238a0b923820dcc509a6f75849b', 'bac7', 0, 0, 0, 0),
-(23, 'bac8', 'c4ca4238a0b923820dcc509a6f75849b', 'bac8', 0, 0, 0, 0),
-(24, 'bac9', 'c4ca4238a0b923820dcc509a6f75849b', 'bac9', 0, 0, 0, 0),
-(25, 'bac10', 'c4ca4238a0b923820dcc509a6f75849b', 'bac10', 0, 0, 0, 20),
-(26, 'bac11', 'c4ca4238a0b923820dcc509a6f75849b', 'bac11', 0, 0, 0, 0),
-(27, 'bac12', 'c4ca4238a0b923820dcc509a6f75849b', 'bac12', 0, 0, 0, 0),
-(28, 'hung', 'c4ca4238a0b923820dcc509a6f75849b', 'hungol', 0, 0, 0, 0),
-(29, 'XuanBac', 'c4ca4238a0b923820dcc509a6f75849b', 'XuanBac', 0, 0, 0, 0),
-(30, 'Dattt', 'c4ca4238a0b923820dcc509a6f75849b', 'Dattt', 0.5, 1, 0, 0),
-(31, 'BACC', 'c4ca4238a0b923820dcc509a6f75849b', 'baccc', 0, 0, 0, 0);
-
 CREATE TABLE `history` (
   `id` int(11) NOT NULL,
   `username1` varchar(50) NOT NULL,
